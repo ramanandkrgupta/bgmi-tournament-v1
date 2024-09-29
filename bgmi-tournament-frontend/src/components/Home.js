@@ -24,8 +24,8 @@ const Home = () => {
 
         const fetchTeams = async () => {
             try {
-                const userId = localStorage.getItem('userId');
-                const response = await axios.get(`/team?userId=${userId}`);
+                //const userId = localStorage.getItem('userId');
+                const response = await axios.get(`/team`);
                 setTeams(response.data);
             } catch (error) {
                 console.error("Error fetching teams:", error);
@@ -72,7 +72,7 @@ const Home = () => {
     );
 
     const renderTeamModal = () => (
-        <div className="modal">
+        <div className={`modal ${showModal ? 'block' : 'hidden'}`} style={{ display: showModal ? 'block' : 'none' }}>
             <div className="modal-box">
                 <h2>Select a Team</h2>
                 <ul>
@@ -106,7 +106,7 @@ const Home = () => {
                 <h2 className="text-3xl font-bold text-red-500 mb-4">Completed Matches</h2>
                 {matches.completed.map(match => renderMatchCard(match, false))}
             </section>
-            {showModal && renderTeamModal()}
+            {renderTeamModal()}
         </div>
     );
 };
