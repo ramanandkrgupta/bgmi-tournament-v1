@@ -8,7 +8,10 @@ const Home = () => {
         completed: []
     });
     const [teams, setTeams] = useState([]);
+    const [teamSelection, setTeamSelection] = useState({});
+
     const [selectedTeam, setSelectedTeam] = useState(null);
+    const [selectedTeamId, setSelectedTeamId] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedMatchId, setSelectedMatchId] = useState(null);
 
@@ -38,10 +41,10 @@ const Home = () => {
 
     const handleJoin = async () => {
         try {
-            const userId = localStorage.getItem('userId');
+            //const userId = localStorage.getItem('userId');
             await axios.post(`/tournament/matches/${selectedMatchId}/join`, {
-                userId,
-                teamId: selectedTeam
+               
+                teamId: selectedTeamId
             });
             alert('Successfully joined the match');
             setShowModal(false);
@@ -59,7 +62,7 @@ const Home = () => {
                 {canJoin && 
                     <button 
                         onClick={() => {
-                            setSelectedMatchId(match.id);
+                            setSelectedMatchId(match._id);
                             setShowModal(true);
                         }} 
                         className="btn btn-primary mt-2"
@@ -72,20 +75,38 @@ const Home = () => {
     );
 
     const renderTeamModal = () => (
-        <div className={`modal ${showModal ? 'block' : 'hidden'}`} style={{ display: showModal ? 'block' : 'none' }}>
-            <div className="modal-box">
-                <h2>Select a Team</h2>
-                <ul>
-                    {teams.map(team => (
-                        <li key={team.id} onClick={() => setSelectedTeam(team.id)}>
-                            <h3>{team.name}</h3>
-                            <p>Members: {team.members.join(', ')}</p>
-                        </li>
+        <div 
+            className={`fixed inset-0 z-50 flex items-center justify-center ${showModal ? 'block' : 'hidden'}`} 
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} // Backdrop
+        >
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+                <h2 className="text-2xl font-bold mb-4">Select a Team</h2>
+                <select
+                    value={selectedTeamId || ''} 
+                    onChange={(e) => setSelectedTeamId(e.target.value)} 
+                    className="w-full p-3 border rounded-md bg-gray-100"
+                >
+                    <option value="" disabled>Select your team</option>
+                    {teams.map((team) => (
+                        <option key={team._id} value={team._id}>
+                            {team.name} - Members: {team.members.join(', ')}
+                        </option>
                     ))}
-                </ul>
-                <div className="modal-action">
-                    <button onClick={handleJoin} className="btn btn-primary">Join with Selected Team</button>
-                    <button onClick={() => setShowModal(false)} className="btn">Cancel</button>
+                </select>
+                <div className="mt-4 flex justify-end space-x-2">
+                    <button 
+                        onClick={handleJoin} 
+                        className={`btn ${selectedTeamId ? 'btn-primary' : 'btn-disabled'}`}
+                        disabled={!selectedTeamId} 
+                    >
+                        Join with Selected Team
+                    </button>
+                    <button 
+                        onClick={() => setShowModal(false)} 
+                        className="btn btn-secondary"
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

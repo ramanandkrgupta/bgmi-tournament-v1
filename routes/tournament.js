@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
 const Tournament = require('../models/Tournament');
@@ -8,6 +9,13 @@ const checkUserBalance = require('../utils/checkUserBalance');
 
 // Middleware to authenticate user
 router.use(authenticate);
+
+// Utility function to get user ID from token
+const getUserIdFromToken = (req) => {
+    const token = req.headers.authorization.split(' ')[1]; // Assuming Bearer token
+    const decodedToken = jwt.verify(token, 'YOUR_SECRET_KEY'); // Replace 'YOUR_SECRET_KEY' with your actual secret key
+    return decodedToken.userId;
+};
 
 // Create a new tournament
 // List tournament matches by status
@@ -31,7 +39,8 @@ router.get('/matches', async (req, res) => {
 router.post('/matches/:id/join', async (req, res) => {
     try {
         const tournamentId = req.params.id;
-        const { teamId, userId } = req.body;
+        const { teamId } = req.body;
+        const userId = getUserIdFromToken(req);
         const tournament = await Tournament.findById(tournamentId);
         
         if (!tournament) {
