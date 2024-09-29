@@ -42,4 +42,20 @@ router.post('/join', async (req, res) => {
     }
 });
 
+// Fetch teams by user ID
+router.get('/', async (req, res) => {
+    try {
+        const { userId } = req.query;
+        const teams = await Team.find({
+            $or: [
+                { createdBy: userId },
+                { members: userId }
+            ]
+        });
+        res.send(teams);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
 module.exports = router;

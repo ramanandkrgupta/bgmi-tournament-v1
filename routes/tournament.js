@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/User');
 const Tournament = require('../models/Tournament');
 const authenticate = require('../middlewares/authenticate');
+const checkUserBalance = require('../utils/checkUserBalance');
+
 
 // Middleware to authenticate user
 router.use(authenticate);
@@ -41,12 +44,36 @@ router.post('/matches/:id/join', async (req, res) => {
             return res.status(400).send('Team already joined this tournament');
         }
 
-        // Assume we have a function to check user's balance
-        const hasSufficientBalance = await checkUserBalance(userId, tournament.entryFee);
-        if (!hasSufficientBalance) {
-            return res.status(400).send('Insufficient balance to join the tournament');
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
         }
 
+        // Calculate the amount to be deducted from each wallet
+        let entryFee = tournament.entryFee;
+        let bonusFee = entryFee * 0.02;
+        entryFee -= bonusFee;
+
+        if (user.bonusWallet >= bonusFee) {
+            user.bonusWallet -= bonusFee;
+        } else {
+            bonusFee = user.bonusWallet;
+            user.bonusWallet = 0;
+        }
+
+        if (user.depositWallet >= entryFee) {
+            user.depositWallet -= entryFee;
+        } else {
+            const remainingFee = entryFee - user.depositWallet;
+            user.depositWallet = 0;
+            if (user.winningsWallet >= remainingFee) {
+                user.winningsWallet -= remainingFee;
+            } else {
+                return res.status(400).send('Insufficient balance to join the tournament');
+            }
+        }
+
+        await user.save();
         tournament.teams.push(teamId);
         await tournament.save();
         res.send('Team joined tournament successfully');
@@ -54,6 +81,7 @@ router.post('/matches/:id/join', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
 
 router.post('/create', async (req, res) => {
     try {

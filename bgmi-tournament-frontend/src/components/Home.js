@@ -7,6 +7,10 @@ const Home = () => {
         ongoing: [],
         completed: []
     });
+    const [teams, setTeams] = useState([]);
+    const [selectedTeam, setSelectedTeam] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedMatchId, setSelectedMatchId] = useState(null);
 
     useEffect(() => {
         const fetchMatches = async () => {
@@ -17,13 +21,30 @@ const Home = () => {
                 console.error("Error fetching matches:", error);
             }
         };
+
+        const fetchTeams = async () => {
+            try {
+                const userId = localStorage.getItem('userId');
+                const response = await axios.get(`/team?userId=${userId}`);
+                setTeams(response.data);
+            } catch (error) {
+                console.error("Error fetching teams:", error);
+            }
+        };
+
         fetchMatches();
+        fetchTeams();
     }, []);
 
-    const handleJoin = async (matchId) => {
+    const handleJoin = async () => {
         try {
-            await axios.post(`/tournament/matches/${matchId}/join`);
+            const userId = localStorage.getItem('userId');
+            await axios.post(`/tournament/matches/${selectedMatchId}/join`, {
+                userId,
+                teamId: selectedTeam
+            });
             alert('Successfully joined the match');
+            setShowModal(false);
         } catch (error) {
             alert(error.response.data);
         }
@@ -35,7 +56,37 @@ const Home = () => {
                 <h3 className="card-title">{match.title}</h3>
                 <p>{match.details}</p>
                 <p>Entry Fee: {match.entryFee}</p>
-                {canJoin && <button onClick={() => handleJoin(match.id)} className="btn btn-primary mt-2">Join</button>}
+                {canJoin && 
+                    <button 
+                        onClick={() => {
+                            setSelectedMatchId(match.id);
+                            setShowModal(true);
+                        }} 
+                        className="btn btn-primary mt-2"
+                    >
+                        Join
+                    </button>
+                }
+            </div>
+        </div>
+    );
+
+    const renderTeamModal = () => (
+        <div className="modal">
+            <div className="modal-box">
+                <h2>Select a Team</h2>
+                <ul>
+                    {teams.map(team => (
+                        <li key={team.id} onClick={() => setSelectedTeam(team.id)}>
+                            <h3>{team.name}</h3>
+                            <p>Members: {team.members.join(', ')}</p>
+                        </li>
+                    ))}
+                </ul>
+                <div className="modal-action">
+                    <button onClick={handleJoin} className="btn btn-primary">Join with Selected Team</button>
+                    <button onClick={() => setShowModal(false)} className="btn">Cancel</button>
+                </div>
             </div>
         </div>
     );
@@ -55,6 +106,7 @@ const Home = () => {
                 <h2 className="text-3xl font-bold text-red-500 mb-4">Completed Matches</h2>
                 {matches.completed.map(match => renderMatchCard(match, false))}
             </section>
+            {showModal && renderTeamModal()}
         </div>
     );
 };
