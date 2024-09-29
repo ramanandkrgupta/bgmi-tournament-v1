@@ -7,6 +7,9 @@ const transactionRoutes = require('./routes/transaction');
 
 const app = express();
 
+const cors = require('cors');
+
+
 mongoose.connect('mongodb://localhost:27017/bgmi-tournament', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -14,6 +17,13 @@ mongoose.connect('mongodb://localhost:27017/bgmi-tournament', {
   .catch(err => console.log(err));
 
 app.use(express.json());
+// Add CORS middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Adjust the origin as needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use('/auth', authRoutes);
 app.use('/team', teamRoutes);
 app.use('/tournament', tournamentRoutes);

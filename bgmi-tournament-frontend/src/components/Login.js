@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [formData, setFormData] = useState({
         identifier: '',
         password: ''
     });
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,7 +17,9 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/auth/login', formData);
+            localStorage.setItem('token', response.data.token);
             alert('Login successful');
+            navigate('/home');
         } catch (error) {
             alert(error.response.data);
         }
