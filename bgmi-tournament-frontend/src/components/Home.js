@@ -68,6 +68,10 @@ const Home = () => {
         <span className="text-white text-sm font-bold">PRIZEPOOL</span>
         <span className="text-yellow-400 text-2xl font-bold">{match.prize} INR</span>
       </div>
+      <div className="absolute bottom-0 left-50 right-0 bg-black bg-opacity-50 rounded-t-lg  flex justify-between items-center">
+        <span className="text-white text-xs font-bold">SPONSORED BY:</span>
+        <span className="text-white text-xs font-bold"><a href={match.hostLink}>{match.hostName}</a></span>
+      </div>
       <div className="mt-2">
         <h2 className="text-white text-xl font-bold">{match.name}</h2>
         <p className="text-blue-500 text-lg font-bold">

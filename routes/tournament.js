@@ -39,20 +39,22 @@ router.get('/matches', async (req, res) => {
 router.get('/matches/:id', async (req, res) => {
     try {
         const matchId = req.params.id;
-      const match = await Tournament.findById(matchId);
-      if (!match) {
-        return res.status(404).json({ message: 'Match not found' });
-      }
-      res.json(match);
+        const match = await Tournament.findById(matchId).populate('teams', 'name');
+        if (!match) {
+            return res.status(404).json({ message: 'Match not found' });
+        }
+        res.json(match);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  });
+});
   
   // Get teams that joined a match by match ID
-  router.get('/matches/:id/teams', async (req, res) => {
+// Get teams that joined a match by match ID
+router.get('/matches/:id/teams', async (req, res) => {
     try {
-      const teams = await Tournament.find({ matchId: req.params.id });
+      const matchId = req.params.id;
+      const teams = await teams.find({ _id: matchId });
       res.json(teams);
     } catch (error) {
       res.status(500).json({ message: error.message });
