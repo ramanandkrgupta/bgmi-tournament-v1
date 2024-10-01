@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "index.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "bgmi-tournament-frontend/package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "bgmi-tournament-frontend/build"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/index.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "bgmi-tournament-frontend/$1"
+      }
+    ]
+  }
