@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Registration from './components/Registration';
 import Login from './components/Login';
 import Home from './components/Home';
+import MatchDetails from './components/MatchDetails';
 
 function App() {
     return (
@@ -11,6 +12,7 @@ function App() {
                 <Route path="/register" element={<Registration />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/match/:id" element={<MatchDetails />} />
             </Routes>
         </Router>
     );
