@@ -1,0 +1,20 @@
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  
+  .menu-item.active {
+    transform: scale(1.2);
+    color: #fbbf24; /* Tailwind amber-400 */
+  }
+  
+  .menu-item.home {
+    transform: scale(1.4);
+  }
+  
+  .menu-item:hover {
+    transform: scale(1.1);
+  }
+  

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../utils/axiosConfig';
 import { useParams } from 'react-router-dom';
+import Navbar from './Navbar';
 
 
 const MatchDetails = () => {
@@ -219,8 +220,10 @@ const MatchDetails = () => {
   };
 
   return (
+  
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-bold text-white mb-6">{match.name} Details</h1>
+        <header className='pb-3 w-full sticky top-0 z-10'><Navbar></Navbar></header> 
+      {/* <h1 className="text-lg font-bold text-white mb-6">{match.name} Details</h1> */}
       {renderMatchCard()}
       {renderTabs()}
       <section>{renderContent()}</section>

@@ -44,4 +44,24 @@ router.post('/login', async (req, res) => {
     }
 });
 
+const secretKey = 'YOUR_SECRET_KEY';
+
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ isAuthenticated: false, message: 'No token provided' });
+    }
+  
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ isAuthenticated: false, message: 'Failed to authenticate token' });
+      }
+      req.userId = decoded.id;
+      next();
+    });
+};
+router.get('/check', verifyToken, (req, res) => {
+    res.status(200).json({ isAuthenticated: true });
+  });
+
 module.exports = router;

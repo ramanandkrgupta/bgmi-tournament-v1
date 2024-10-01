@@ -1,11 +1,14 @@
 const express = require('express');
+const app = express();
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const teamRoutes = require('./routes/team');
 const tournamentRoutes = require('./routes/tournament');
 const transactionRoutes = require('./routes/transaction');
+const userRoutes = require('./routes/user');
 
-const app = express();
+
+app.use(express.json());
 
 const cors = require('cors');
 
@@ -27,6 +30,8 @@ app.use(cors({
 app.use('/auth', authRoutes);
 app.use('/team', teamRoutes);
 app.use('/tournament', tournamentRoutes);
+//app.use('/uuu', userRoutes);
+app.use('/user', userRoutes);
 app.use('/transaction', transactionRoutes);
 
 const PORT = process.env.PORT || 5000;
