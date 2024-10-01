@@ -65,7 +65,7 @@ router.get('/matches/:id/teams', async (req, res) => {
 router.post('/matches/:id/join', async (req, res) => {
     try {
         const tournamentId = req.params.id;
-        const { teamId } = req.body;
+        const { teamId, teamName } = req.body;
         const userId = getUserIdFromToken(req);
         const tournament = await Tournament.findById(tournamentId);
         
@@ -109,7 +109,12 @@ router.post('/matches/:id/join', async (req, res) => {
         }
 
         await user.save();
-        tournament.teams.push(teamId);
+        tournament.teams.push(
+           { teamId,
+            teamName,
+            kills: 0,
+            placePoints: 0,
+            totalPoints: 0});
         await tournament.save();
         res.send('Team joined tournament successfully');
     } catch (error) {

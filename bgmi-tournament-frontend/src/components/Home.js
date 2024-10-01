@@ -11,6 +11,7 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState('upcoming'); // state to control active tab
   const [teams, setTeams] = useState([]);
   const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const [selectedTeamName, setSelectedTeamName ]= useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const navigate = useNavigate(); // Initialize the navigate function
@@ -43,9 +44,13 @@ const Home = () => {
       alert("Please select a team and a match.");
       return; 
     }
+  
+    const selectedTeam = await teams.find(team => team._id === selectedTeamId);
+  
     try {
       await axios.post(`/tournament/matches/${selectedMatch._id}/join`, {
-        teamId: selectedTeamId
+        teamId: selectedTeamId,
+        teamName: selectedTeam.name // Include teamName in the request
       });
       alert('Successfully joined the match');
       setShowModal(false);
@@ -178,6 +183,7 @@ const Home = () => {
             <option key={team._id} value={team._id}>
               {team.name} - Members: {team.members.join(', ')}
             </option>
+            
           ))}
         </select>
         <div className="mt-4 flex justify-end space-x-2">
