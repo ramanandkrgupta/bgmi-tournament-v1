@@ -10,7 +10,7 @@ const app = express();
 const cors = require('cors');
 
 
-mongoose.connect('mongodb://localhost:27017/bgmi-tournament', {
+mongoose.connect('mongodb+srv://rgupta1842005:qsNnxzSDuyf5DPlV@bgmi.e2o1j.mongodb.net/?retryWrites=true&w=majority&appName=bgmi', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => console.log('MongoDB connected'))

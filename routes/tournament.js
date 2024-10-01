@@ -75,11 +75,16 @@ router.post('/matches/:id/join', async (req, res) => {
         if (tournament.status !== 'upcoming') {
             return res.status(400).send('Cannot join an ongoing or completed tournament');
         }
-        if (tournament.teams.includes(teamId)) {
+         // Check if the tournament has reached the maximum number of teams
+         if (tournament.teams.length >= tournament.maxTeamJoin) {
+            return res.status(401).send('Tournament has reached the maximum number of teams');
+        }
+        if (tournament.teams.some(team => team.teamId.toString() === teamId.toString())) {
             return res.status(400).send('Team already joined this tournament');
         }
 
         const user = await User.findById(userId);
+// This JavaScript code implements a RESTful API for managing tournaments using Express.js, JWT authentication, and MongoDB. It allows users to create and join tournaments, list matches by status, retrieve match details, and manage teams within matches. The API also includes functionality for checking user balances and deducting entry fees from different wallets (bonus, deposit, winnings).
         if (!user) {
             return res.status(404).send('User not found');
         }
