@@ -22,11 +22,15 @@ router.post('/register', async (req, res) => {
     }
 });
 
+const jwt = require('jsonwebtoken');
+const express = require('express');
+const User = require('../models/User'); // Adjust the path to your User model
+
 router.post('/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
 
-        // Check if the identifier (email/username/mobile) exists
+        // Find user by email, mobile, or username
         const user = await User.findOne({
             $or: [
                 { email: identifier },
@@ -35,19 +39,21 @@ router.post('/login', async (req, res) => {
             ]
         });
 
-        // If user doesn't exist or password doesn't match, send error
+        // If user not found or password does not match
         if (!user || !(await user.comparePassword(password))) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user._id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
+        const token = jwt.sign(
+            { userId: user._id }, 
+            'YOUR_SECRET_KEY', // Use an environment variable for production
+            { expiresIn: '1h' } // Token expiration (optional)
+        );
 
-        // Store token in session (if needed)
-        req.session.token = token;
-
-        // Send the token to the client
+        // Return token in the response (no session handling)
         res.status(200).json({ token });
+
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Internal server error' });
