@@ -25,6 +25,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
+
+        // Check if the identifier (email/username/mobile) exists
         const user = await User.findOne({
             $or: [
                 { email: identifier },
@@ -32,17 +34,26 @@ router.post('/login', async (req, res) => {
                 { username: identifier }
             ]
         });
+
+        // If user doesn't exist or password doesn't match, send error
         if (!user || !(await user.comparePassword(password))) {
-            return res.status(400).send('Invalid credentials');
+            return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user._id }, 'YOUR_SECRET_KEY');
+        // Generate JWT token
+        const token = jwt.sign({ userId: user._id }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
+
+        // Store token in session (if needed)
         req.session.token = token;
-        res.send({ token });
+
+        // Send the token to the client
+        res.status(200).json({ token });
     } catch (error) {
-        res.status(400).send(error.message);
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 const secretKey = 'YOUR_SECRET_KEY';
 
